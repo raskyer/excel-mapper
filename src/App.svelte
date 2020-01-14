@@ -1,11 +1,12 @@
 <script>
-	import XLSX from 'xlsx';
+	import { uploadFile, findName, extractSheetData } from './utils';
 
 	// Files
-	let customerProviderFiles = [];
+	let dataFiles = [];
 	let orderFiles = [];
 	let sheetNames = [];
-	let customerProviderWorkbook = null;
+	let dataWorkbook = null;
+	let orderWorkbook = null;
 	
 	// Customer
 	let customerSheet = null;
@@ -22,47 +23,41 @@
 	const handleCustomerSheet = workbook => {
 			console.log(workbook);
 			sheetNames = [...workbook.SheetNames];
-			customerProviderWorkbook = workbook;
+			dataWorkbook = workbook;
+			customerSheet = findName(sheetNames, 'Client');
+			providerSheet = findName(sheetNames, 'Transporteur');
 	};
 
 	const handleOrderSheet = workbook => {};
 
-	const handleFile = (file, callback) => {
-		const reader = new FileReader();
-		reader.onload = function(e) {
-			const data = new Uint8Array(e.target.result);
-			const workbook = XLSX.read(data, {type: 'array'});
-			callback(workbook);
-		};
-		reader.readAsArrayBuffer(file);
-	};
-
 	$: {
-		if (customerProviderFiles.length > 0) {
-			handleFile(customerProviderFiles[0], handleCustomerSheet);
+		if (dataFiles.length > 0) {
+			uploadFile(dataFiles[0], handleCustomerSheet);
 		}
 		if (orderFiles.length > 0) {
-			handleFile(orderFiles[0], handleOrderSheet);
+			uploadFile(orderFiles[0], handleOrderSheet);
 		}
 	}
 
 	// On First XLS Load & Customer Sheet change, update customer cells
 	$: {
-		if (customerProviderWorkbook !== null && customerSheet !== null) {
-			const sheet = customerProviderWorkbook.Sheets[customerSheet];
-			customerCells = Object.keys(sheet)
-				.filter(k => k.match(/[A-Z]1/g))
-				.map(k => sheet[k].v);
+		if (dataWorkbook !== null && customerSheet !== null) {
+			const sheet = dataWorkbook.Sheets[customerSheet];
+			const data = extractSheetData(sheet);
+			customerCells = data[0];
+			customerIDCell = findName(customerCells, 'Nom');
+			customerRatingCell = findName(customerCells, '\0');
 		}
 	}
 
 	// On First XLS Load & Provider Sheet change, update provider cells
 	$: {
-		if (customerProviderWorkbook !== null && providerSheet !== null) {
-			const sheet = customerProviderWorkbook.Sheets[providerSheet];
-			providerCells = Object.keys(sheet)
-				.filter(k => k.match(/[A-Z]1/g))
-				.map(k => sheet[k].v);
+		if (dataWorkbook !== null && providerSheet !== null) {
+			const sheet = dataWorkbook.Sheets[providerSheet];
+			const data = extractSheetData(sheet);
+			providerCells = data[0];
+			providerIDCell = findName(providerCells, 'Nom');
+			providerRatingCell = findName(providerCells, 'Note');
 		}
 	}
 </script>
@@ -80,13 +75,13 @@
 				<input
 					id="customer-provider-file"
 					type="file"
-					class={"form-control " + (customerProviderFiles.length < 1 ? "is-invalid" : "is-valid")}
-					bind:files={customerProviderFiles}
+					class={"form-control " + (dataFiles.length < 1 ? "is-invalid" : "is-valid")}
+					bind:files={dataFiles}
 					required
 				/>
 			</div>
 
-			{#if customerProviderFiles.length > 0}
+			{#if dataFiles.length > 0}
 				<div class="row">
 					<div class="col-6">
 						<div class="form-group">
