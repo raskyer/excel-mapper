@@ -215,7 +215,12 @@
 					<div class="col-6">
 						<div class="form-group">
 							<label for="order-customer-id">Cellule d'ID Client :</label>
-							<select id="order-customer-id" class="form-control">
+							<select
+								id="order-customer-id"
+								class="form-control"
+								required
+							>
+								<option value={null}>Choissisez...</option>
 							</select>
 						</div>
 					</div>
@@ -223,7 +228,12 @@
 					<div class="col-6">
 						<div class="form-group">
 							<label for="order-provider-id">Cellule d'ID Fournisseur :</label>
-							<select id="order-provider-id" class="form-control">
+							<select
+								id="order-provider-id"
+								class="form-control"
+								required
+							>
+								<option value={null}>Choissisez...</option>
 							</select>
 						</div>
 					</div>
@@ -231,13 +241,23 @@
 
 				<div class="form-group">
 					<label for="order-date">Cellule de date</label>
-					<select id="order-date" class="form-control">
+					<select
+						id="order-date"
+						class="form-control"
+						required
+					>
+						<option value={null}>Choissisez...</option>
 					</select>
 				</div>
 
 				<div class="form-group">
 					<label for="order-time">Cellule d'horaire</label>
-					<select id="order-time" class="form-control">
+					<select
+						id="order-time"
+						class="form-control"
+						required
+					>
+						<option value={null}>Choissisez...</option>
 					</select>
 				</div>
 			{/if}
