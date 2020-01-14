@@ -1,5 +1,5 @@
 <script>
-	import { uploadFile, findName, extractSheetData } from './utils';
+	import { uploadFile, findName, extractSheetData, compute } from './utils';
 
 	// Files
 	let dataFiles = [];
@@ -20,20 +20,71 @@
 	let providerIDCell = null;
 	let providerRatingCell = null;
 
+	// Order
+	let orderCells = [];
+	let orderCustomerIDCell = null;
+	let orderProviderIDCell = null;
+	let orderDateCell = null;
+	let orderTimeCell = null;
+
+	// Settings
+	let stxProviderRating = 3;
+	let stxDate = 2;
+	let stxCustomerRating = 1;
+
 	const handleCustomerSheet = workbook => {
-			console.log(workbook);
 			sheetNames = [...workbook.SheetNames];
 			dataWorkbook = workbook;
 			customerSheet = findName(sheetNames, 'Client');
 			providerSheet = findName(sheetNames, 'Transporteur');
 	};
 
-	const handleOrderSheet = workbook => {};
+	const handleOrderSheet = workbook => {
+		orderWorkbook = workbook;
+		const sheet = orderWorkbook.Sheets[orderWorkbook.SheetNames[0]];
+		const data = extractSheetData(sheet);
+		orderCells = data[0];
+		orderCustomerIDCell = findName(orderCells, 'Nom Client');
+		orderProviderIDCell = findName(orderCells, 'Nom Fourn.');
+		orderDateCell = findName(orderCells, 'Date');
+		orderTimeCell = findName(orderCells, 'Date');
+	};
+
+	const onSubmit = e => {
+		e.preventDefault();
+
+		const dataSetting = {
+			customerSheet,
+			customerIDCell,
+			customerRatingCell,
+			providerSheet,
+			providerIDCell,
+			providerRatingCell
+		};
+
+		const orderSetting = {
+			orderCustomerIDCell,
+			orderProviderIDCell,
+			orderDateCell,
+			orderTimeCell
+		};
+
+		const appSetting = {
+			stxProviderRating,
+			stxDate,
+			stxCustomerRating
+		};
+
+		compute(dataSetting, orderSetting, appSetting, dataWorkbook, orderWorkbook);
+	};
 
 	$: {
 		if (dataFiles.length > 0) {
 			uploadFile(dataFiles[0], handleCustomerSheet);
 		}
+	}
+
+	$: {
 		if (orderFiles.length > 0) {
 			uploadFile(orderFiles[0], handleOrderSheet);
 		}
@@ -45,8 +96,8 @@
 			const sheet = dataWorkbook.Sheets[customerSheet];
 			const data = extractSheetData(sheet);
 			customerCells = data[0];
-			customerIDCell = findName(customerCells, 'Nom');
-			customerRatingCell = findName(customerCells, '\0');
+			customerIDCell = customerIDCell ? customerIDCell : findName(customerCells, 'Nom');
+			customerRatingCell = customerRatingCell ? customerRatingCell : findName(customerCells, '\0');
 		}
 	}
 
@@ -56,8 +107,8 @@
 			const sheet = dataWorkbook.Sheets[providerSheet];
 			const data = extractSheetData(sheet);
 			providerCells = data[0];
-			providerIDCell = findName(providerCells, 'Nom');
-			providerRatingCell = findName(providerCells, 'Note');
+			providerIDCell = providerIDCell ? providerIDCell : findName(providerCells, 'Nom');
+			providerRatingCell = providerRatingCell ? providerRatingCell : findName(providerCells, 'Note');
 		}
 	}
 </script>
@@ -66,7 +117,7 @@
 	<h1>Excel Mapper</h1>
 	<img src="" alt="logo"/>
 
-	<form>
+	<form on:submit={onSubmit}>
 		<fieldset>
 			<legend>Clients / Fournisseurs</legend>
 
@@ -217,10 +268,16 @@
 							<label for="order-customer-id">Cellule d'ID Client :</label>
 							<select
 								id="order-customer-id"
-								class="form-control"
+								class={"form-control " + (orderCustomerIDCell === null ? "is-invalid" : "is-valid")}
+								bind:value={orderCustomerIDCell}
 								required
 							>
 								<option value={null}>Choissisez...</option>
+								{#each orderCells as cell}
+									<option value={cell}>
+										{cell}
+									</option>
+								{/each}
 							</select>
 						</div>
 					</div>
@@ -230,10 +287,16 @@
 							<label for="order-provider-id">Cellule d'ID Fournisseur :</label>
 							<select
 								id="order-provider-id"
-								class="form-control"
+								class={"form-control " + (orderProviderIDCell === null ? "is-invalid" : "is-valid")}
+								bind:value={orderProviderIDCell}
 								required
 							>
 								<option value={null}>Choissisez...</option>
+								{#each orderCells as cell}
+									<option value={cell}>
+										{cell}
+									</option>
+								{/each}
 							</select>
 						</div>
 					</div>
@@ -243,10 +306,16 @@
 					<label for="order-date">Cellule de date</label>
 					<select
 						id="order-date"
-						class="form-control"
+						class={"form-control " + (orderDateCell === null ? "is-invalid" : "is-valid")}
+						bind:value={orderDateCell}
 						required
 					>
 						<option value={null}>Choissisez...</option>
+						{#each orderCells as cell}
+							<option value={cell}>
+								{cell}
+							</option>
+						{/each}
 					</select>
 				</div>
 
@@ -254,10 +323,16 @@
 					<label for="order-time">Cellule d'horaire</label>
 					<select
 						id="order-time"
-						class="form-control"
+						class={"form-control " + (orderTimeCell === null ? "is-invalid" : "is-valid")}
+						bind:value={orderTimeCell}
 						required
 					>
 						<option value={null}>Choissisez...</option>
+						{#each orderCells as cell}
+							<option value={cell}>
+								{cell}
+							</option>
+						{/each}
 					</select>
 				</div>
 			{/if}
@@ -267,18 +342,33 @@
 			<legend>Ajuster les notations</legend>
 
 			<div class="form-group">
-				<label for="rating-adjust">Ajuster l'importance de la note fournisseur :</label>
-				<input type="number" class="form-control" value="8" />
+				<label for="rating-provider">Ajuster l'importance de la note fournisseur :</label>
+				<input
+					id="rating-provider"
+					type="number"
+					class="form-control"
+					bind:value={stxProviderRating}
+				/>
 			</div>
 
 			<div class="form-group">
-				<label for="rating-adjust">Ajuster l'importance de la date :</label>
-				<input type="number" class="form-control" value="4" />
+				<label for="rating-date">Ajuster l'importance de la date :</label>
+				<input
+					id="rating-date"
+					type="number"
+					class="form-control"
+					bind:value={stxDate}
+				/>
 			</div>
 
 			<div class="form-group">
-				<label for="rating-adjust">Ajuster l'importance de la note client :</label>
-				<input type="number" class="form-control" value="2" />
+				<label for="rating-customer">Ajuster l'importance de la note client :</label>
+				<input
+					id="rating-customer"
+					type="number"
+					class="form-control"
+					bind:value={stxCustomerRating}
+				/>
 			</div>
 		</fieldset>
 
