@@ -1,5 +1,5 @@
 <script>
-	import { uploadFile, findName, extractSheetData, compute } from './utils';
+	import { uploadFile, findSheet, findCell, extractSheetData, compute } from './utils';
 
 	// Files
 	let dataFiles = [];
@@ -35,8 +35,8 @@
 	const handleCustomerSheet = workbook => {
 			sheetNames = [...workbook.SheetNames];
 			dataWorkbook = workbook;
-			customerSheet = findName(sheetNames, 'Client');
-			providerSheet = findName(sheetNames, 'Transporteur');
+			customerSheet = findSheet(sheetNames, 'Client');
+			providerSheet = findSheet(sheetNames, 'Transporteur');
 	};
 
 	const handleOrderSheet = workbook => {
@@ -44,10 +44,10 @@
 		const sheet = orderWorkbook.Sheets[orderWorkbook.SheetNames[0]];
 		const data = extractSheetData(sheet);
 		orderCells = data[0];
-		orderCustomerIDCell = findName(orderCells, 'Nom Client');
-		orderProviderIDCell = findName(orderCells, 'Nom Fourn.');
-		orderDateCell = findName(orderCells, 'Date');
-		orderTimeCell = findName(orderCells, 'Date');
+		orderCustomerIDCell = findCell(orderCells, 'Nom Client');
+		orderProviderIDCell = findCell(orderCells, 'Nom Fourn.');
+		orderDateCell = findCell(orderCells, 'Date');
+		orderTimeCell = findCell(orderCells, 'Date');
 	};
 
 	const onSubmit = e => {
@@ -90,8 +90,8 @@
 			const sheet = dataWorkbook.Sheets[customerSheet];
 			const data = extractSheetData(sheet);
 			customerCells = data[0];
-			customerIDCell = customerIDCell ? customerIDCell : findName(customerCells, 'Nom');
-			customerRatingCell = customerRatingCell ? customerRatingCell : findName(customerCells, '\0');
+			customerIDCell = customerIDCell ? customerIDCell : findCell(customerCells, 'Nom');
+			customerRatingCell = customerRatingCell ? customerRatingCell : findCell(customerCells, 'Sp');
 		}
 	}
 
@@ -101,8 +101,8 @@
 			const sheet = dataWorkbook.Sheets[providerSheet];
 			const data = extractSheetData(sheet);
 			providerCells = data[0];
-			providerIDCell = providerIDCell ? providerIDCell : findName(providerCells, 'Nom');
-			providerRatingCell = providerRatingCell ? providerRatingCell : findName(providerCells, 'Note');
+			providerIDCell = providerIDCell ? providerIDCell : findCell(providerCells, 'Nom');
+			providerRatingCell = providerRatingCell ? providerRatingCell : findCell(providerCells, 'Note');
 		}
 	}
 </script>
@@ -156,8 +156,8 @@
 									required
 								>
 									<option value={null}>Choissisez...</option>
-									{#each customerCells as cell}
-										<option value={cell}>
+									{#each customerCells as cell, i}
+										<option value={i}>
 											{cell}
 										</option>
 									{/each}
@@ -173,8 +173,8 @@
 									required
 								>
 									<option value={null}>Choissisez...</option>
-									{#each customerCells as cell}
-										<option value={cell}>
+									{#each customerCells as cell, i}
+										<option value={i}>
 											{cell}
 										</option>
 									{/each}
@@ -211,8 +211,8 @@
 									required
 								>
 									<option value={null}>Choissisez...</option>
-									{#each providerCells as cell}
-										<option value={cell}>
+									{#each providerCells as cell, i}
+										<option value={i}>
 											{cell}
 										</option>
 									{/each}
@@ -228,8 +228,8 @@
 									required
 								>
 									<option value={null}>Choissisez...</option>
-									{#each providerCells as cell}
-										<option value={cell}>
+									{#each providerCells as cell, i}
+										<option value={i}>
 											{cell}
 										</option>
 									{/each}
@@ -267,8 +267,8 @@
 								required
 							>
 								<option value={null}>Choissisez...</option>
-								{#each orderCells as cell}
-									<option value={cell}>
+								{#each orderCells as cell, i}
+									<option value={i}>
 										{cell}
 									</option>
 								{/each}
@@ -286,8 +286,8 @@
 								required
 							>
 								<option value={null}>Choissisez...</option>
-								{#each orderCells as cell}
-									<option value={cell}>
+								{#each orderCells as cell, i}
+									<option value={i}>
 										{cell}
 									</option>
 								{/each}
@@ -305,8 +305,8 @@
 						required
 					>
 						<option value={null}>Choissisez...</option>
-						{#each orderCells as cell}
-							<option value={cell}>
+						{#each orderCells as cell, i}
+							<option value={i}>
 								{cell}
 							</option>
 						{/each}
@@ -322,8 +322,8 @@
 						required
 					>
 						<option value={null}>Choissisez...</option>
-						{#each orderCells as cell}
-							<option value={cell}>
+						{#each orderCells as cell, i}
+							<option value={i}>
 								{cell}
 							</option>
 						{/each}

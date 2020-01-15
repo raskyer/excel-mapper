@@ -10,7 +10,7 @@ export function uploadFile(file, callback) {
   reader.readAsArrayBuffer(file);
 }
 
-export function findName(arr, dict) {
+export function findSheet(arr, dict) {
   return arr.reduce((prev, cur) => {
     if (prev !== null) {
       return prev;
@@ -18,6 +18,14 @@ export function findName(arr, dict) {
     if (cur.indexOf(dict) !== -1) {
       return cur;
     }
+    return null;
+  }, null);
+}
+
+export function findCell(arr, dict) {
+  return arr.reduce((p, c, i) => {
+    if (p !== null) return p;
+    if (c.indexOf(dict) !== -1) return i;
     return null;
   }, null);
 }
@@ -31,7 +39,6 @@ export function compute(settings, dataWorkbook, orderWorkbook) {
   const providerSheet = extractSheetData(dataWorkbook.Sheets[settings.providerSheet]);
   const orderSheet = extractSheetData(orderWorkbook.Sheets[orderWorkbook.SheetNames[0]]);
 
-  // create map for customer & provider: key -> value
   const customerMap = new Map();
   for (let i = 1; i < customerSheet.length; i++) {
     const key = customerSheet[i][settings.customerIDCell];
@@ -44,8 +51,6 @@ export function compute(settings, dataWorkbook, orderWorkbook) {
     providerMap.set(key, providerSheet[i]);
   }
 
-  console.log(customerMap, providerMap);
-
   for (let i = 1; i < orderSheet.length; i++) {
     const customerKey = orderSheet[i][settings.orderCustomerIDCell];
     const providerKey = orderSheet[i][settings.orderProviderIDCell];
@@ -54,12 +59,12 @@ export function compute(settings, dataWorkbook, orderWorkbook) {
     const date = orderSheet[i][settings.orderDateCell];
     const time = orderSheet[i][settings.orderTimeCell];
 
-
-    const providerRanking = provider[settings.providerRatingCell] * settings.stxProviderRating;
+    const providerRanking = provider ? provider[settings.providerRatingCell] * settings.stxProviderRating : 1;
     const dateRanking = date + time * settings.stxDate;
-    const customerRanking = customer[settings.customerRatingCell] * settings.stxCustomerRating; 
+    const customerRanking = customer ? customer[settings.customerRatingCell] * settings.stxCustomerRating : 1; 
 
     const ranking = providerRanking + dateRanking + customerRanking;
+    console.log(ranking);
   }
 
   console.log(customerSheet, providerSheet, orderSheet);
