@@ -33,8 +33,8 @@
 	let stxCustomerRating = 1;
 
 	const handleCustomerSheet = workbook => {
-			sheetNames = [...workbook.SheetNames];
 			dataWorkbook = workbook;
+			sheetNames = [...workbook.SheetNames];
 			customerSheet = findSheet(sheetNames, 'Client');
 			providerSheet = findSheet(sheetNames, 'Transporteur');
 	};
@@ -44,8 +44,8 @@
 		const sheet = orderWorkbook.Sheets[orderWorkbook.SheetNames[0]];
 		const data = extractSheetData(sheet);
 		orderCells = data[0];
-		orderCustomerIDCell = findCell(orderCells, 'Nom Client');
-		orderProviderIDCell = findCell(orderCells, 'Nom Fourn.');
+		orderCustomerIDCell = findCell(orderCells, 'N° Client');
+		orderProviderIDCell = findCell(orderCells, 'N° Fourn');
 		orderDateCell = findCell(orderCells, 'Date');
 		orderTimeCell = findCell(orderCells, 'Date');
 	};
@@ -90,8 +90,8 @@
 			const sheet = dataWorkbook.Sheets[customerSheet];
 			const data = extractSheetData(sheet);
 			customerCells = data[0];
-			customerIDCell = customerIDCell ? customerIDCell : findCell(customerCells, 'Nom');
-			customerRatingCell = customerRatingCell ? customerRatingCell : findCell(customerCells, 'Sp');
+			customerIDCell = customerIDCell ? customerIDCell : findCell(customerCells, 'ID');
+			customerRatingCell = customerRatingCell ? customerRatingCell : findCell(customerCells, 'Niveau');
 		}
 	}
 
@@ -101,7 +101,7 @@
 			const sheet = dataWorkbook.Sheets[providerSheet];
 			const data = extractSheetData(sheet);
 			providerCells = data[0];
-			providerIDCell = providerIDCell ? providerIDCell : findCell(providerCells, 'Nom');
+			providerIDCell = providerIDCell ? providerIDCell : findCell(providerCells, 'ID');
 			providerRatingCell = providerRatingCell ? providerRatingCell : findCell(providerCells, 'Note');
 		}
 	}
