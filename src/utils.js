@@ -10,13 +10,9 @@ export function uploadFile(file, callback) {
 }
 
 export function findSheet(arr, dict) {
-  return arr.reduce((prev, cur) => {
-    if (prev !== null) {
-      return prev;
-    }
-    if (cur.indexOf(dict) !== -1) {
-      return cur;
-    }
+  return arr.reduce((p, c) => {
+    if (p !== null) return p;
+    if (c.indexOf(dict) !== -1) return c;
     return null;
   }, null);
 }
@@ -41,6 +37,9 @@ function calculateProvider(provider, settings) {
 }
 
 function caclulateDate(date, time, settings) {
+  if (date === undefined || time === undefined) {
+    return 1;
+  }
   //date + time * settings.stxDate;
   return 1;
 }
