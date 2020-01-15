@@ -53,29 +53,23 @@
 	const onSubmit = e => {
 		e.preventDefault();
 
-		const dataSetting = {
+		const settings = {
 			customerSheet,
 			customerIDCell,
 			customerRatingCell,
 			providerSheet,
 			providerIDCell,
-			providerRatingCell
-		};
-
-		const orderSetting = {
+			providerRatingCell,
 			orderCustomerIDCell,
 			orderProviderIDCell,
 			orderDateCell,
-			orderTimeCell
-		};
-
-		const appSetting = {
+			orderTimeCell,
 			stxProviderRating,
 			stxDate,
 			stxCustomerRating
 		};
 
-		compute(dataSetting, orderSetting, appSetting, dataWorkbook, orderWorkbook);
+		compute(settings, dataWorkbook, orderWorkbook);
 	};
 
 	$: {
