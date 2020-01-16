@@ -29,6 +29,14 @@ export function extractSheetData(sheet) {
   return XLSX.utils.sheet_to_json(sheet, { header: 1 });
 }
 
+function createMap(sheet, idCell) {
+  const map = new Map();
+  for (let i = 1; i < sheet.length; i++) {
+    map.set(sheet[i][idCell], sheet[i]);
+  }
+  return map;
+}
+
 function calculateProvider(provider, settings) {
   if (provider === undefined) {
     return 1;
@@ -57,23 +65,7 @@ function calculateCustomer(customer, settings) {
   }
 }
 
-export function compute(settings, dataWorkbook, orderWorkbook) {
-  const customerSheet = extractSheetData(dataWorkbook.Sheets[settings.customerSheet]);
-  const providerSheet = extractSheetData(dataWorkbook.Sheets[settings.providerSheet]);
-  const orderSheet = extractSheetData(orderWorkbook.Sheets[orderWorkbook.SheetNames[0]]);
-
-  const customerMap = new Map();
-  for (let i = 1; i < customerSheet.length; i++) {
-    const key = customerSheet[i][settings.customerIDCell];
-    customerMap.set(key, customerSheet[i]);
-  }
-
-  const providerMap = new Map();
-  for (let i = 1; i < providerSheet.length; i++) {
-    const key = providerSheet[i][settings.providerIDCell];
-    providerMap.set(key, providerSheet[i]);
-  }
-
+function createOrderRanking(customerMap, providerMap, orderSheet, settings) {
   const orders = [];
   for (let i = 1; i < orderSheet.length; i++) {
     const customerKey = orderSheet[i][settings.orderCustomerIDCell];
@@ -92,6 +84,19 @@ export function compute(settings, dataWorkbook, orderWorkbook) {
     
     orders.push({ order: orderSheet[i], ranking })
   }
+  return orders.sort((a, b) => b.ranking - a.ranking);
+}
 
-  orders.sort((a, b) => b.ranking - a.ranking).forEach(o => console.log(o));
+export function compute(settings, dataWorkbook, orderWorkbook) {
+  const customerSheet = extractSheetData(dataWorkbook.Sheets[settings.customerSheet]);
+  const providerSheet = extractSheetData(dataWorkbook.Sheets[settings.providerSheet]);
+  const orderSheet = extractSheetData(orderWorkbook.Sheets[orderWorkbook.SheetNames[0]]);
+
+  const customerMap = createMap(customerSheet, settings.customerIDCell);
+  const providerMap = createMap(providerSheet, settings.providerIDCell);
+
+  const orders = createOrderRanking(customerMap, providerMap, orderSheet, settings);
+
+  // project orders => final xls based on config key
+  // save into new excel file
 }

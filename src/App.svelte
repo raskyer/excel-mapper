@@ -32,22 +32,28 @@
 	let stxDate = 2;
 	let stxCustomerRating = 1;
 
-	const handleCustomerSheet = workbook => {
+	const onDataUpload = () => {
+		if (dataFiles.length < 1) return;
+		uploadFile(dataFiles[0], workbook => {
 			dataWorkbook = workbook;
 			sheetNames = [...workbook.SheetNames];
 			customerSheet = findSheet(sheetNames, 'Client');
 			providerSheet = findSheet(sheetNames, 'Transporteur');
+		});
 	};
 
-	const handleOrderSheet = workbook => {
-		orderWorkbook = workbook;
-		const sheet = orderWorkbook.Sheets[orderWorkbook.SheetNames[0]];
-		const data = extractSheetData(sheet);
-		orderCells = data[0];
-		orderCustomerIDCell = findCell(orderCells, 'N° Client');
-		orderProviderIDCell = findCell(orderCells, 'N° Fourn');
-		orderDateCell = findCell(orderCells, 'Date');
-		orderTimeCell = findCell(orderCells, 'Date');
+	const onOrderUpload = () => {
+		if (orderFiles.length < 1) return;
+		uploadFile(orderFiles[0], workbook => {
+			orderWorkbook = workbook;
+			const sheet = orderWorkbook.Sheets[orderWorkbook.SheetNames[0]];
+			const data = extractSheetData(sheet);
+			orderCells = data[0];
+			orderCustomerIDCell = findCell(orderCells, 'N° Client');
+			orderProviderIDCell = findCell(orderCells, 'N° Fourn');
+			orderDateCell = findCell(orderCells, 'Date');
+			orderTimeCell = findCell(orderCells, 'Date');
+		});
 	};
 
 	const onSubmit = e => {
@@ -71,18 +77,6 @@
 
 		compute(settings, dataWorkbook, orderWorkbook);
 	};
-
-	$: {
-		if (dataFiles.length > 0) {
-			uploadFile(dataFiles[0], handleCustomerSheet);
-		}
-	}
-
-	$: {
-		if (orderFiles.length > 0) {
-			uploadFile(orderFiles[0], handleOrderSheet);
-		}
-	}
 
 	// On First XLS Load & Customer Sheet change, update customer cells
 	$: {
@@ -122,6 +116,7 @@
 					type="file"
 					class={"form-control " + (dataFiles.length < 1 ? "is-invalid" : "is-valid")}
 					bind:files={dataFiles}
+					on:change={onDataUpload}
 					required
 				/>
 			</div>
@@ -251,6 +246,7 @@
 					type="file"
 					class={"form-control" + (orderFiles.length < 1 ? " is-invalid" : " is-valid")}
 					bind:files={orderFiles}
+					on:change={onOrderUpload}
 					required
 				/>
 			</div>
