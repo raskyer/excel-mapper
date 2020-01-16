@@ -1,85 +1,58 @@
-const CUSTOMER_SHEET = "customerSheet";
-const CUSTOMER_ID = "customerID";
-const CUSTOMER_RATING = "customerRating";
-
-const PROVIDER_SHEET = "providerSheet";
-const PROVIDER_ID = "providerID";
-const PROVIDER_RATING = "providerRating";
-
-const ORDER_CUSTOMER_ID = "orderCustomerID";
-const ORDER_PROVIDER_ID = "orderProviderID";
-const ORDER_DATE = "orderDate";
-
-const DEFAULT_KEY = {
-  [CUSTOMER_SHEET]: "Client",
-  [CUSTOMER_ID]: "ID",
-  [CUSTOMER_RATING]: "Niveau",
-  
-  [PROVIDER_SHEET]: "Transporteur",
-  [PROVIDER_ID]: "ID",
-  [PROVIDER_RATING]: "Note",
-
-  [ORDER_CUSTOMER_ID]: "N° Client",
-  [ORDER_PROVIDER_ID]: "N° Four",
-  [ORDER_DATE]: "Date"
-};
-
 class Finder {
-  findCustomerSheet(arr) {
-    return findElement(arr, CUSTOMER_SHEET);
-  }
-  
-  findProviderSheet(arr) {
-    return findElement(arr, PROVIDER_SHEET);
-  }
-  
-  findCustomerID(arr) {
-    return findIndex(arr, CUSTOMER_ID);
-  }
-  
-  findProviderID(arr) {
-    return findIndex(arr, PROVIDER_ID);
-  }
-  
-  findCustomerRating(arr) {
-    return findIndex(arr, CUSTOMER_RATING);
-  }
-  
-  findProviderRating(arr) {
-    return findIndex(arr, PROVIDER_RATING);
-  }
-  
-  findOrderCustomerID(arr) {
-    return findIndex(arr, ORDER_CUSTOMER_ID);
-  }
-  
-  findOrderProviderID(arr) {
-    return findIndex(arr, ORDER_PROVIDER_ID);
-  }
-  
-  findOrderDate(arr) {
-    return findIndex(arr, ORDER_DATE);
-  }
-}
+  constructor() {
+    this.CUSTOMER_SHEET = "customerSheet";
+    this.CUSTOMER_ID = "customerID";
+    this.CUSTOMER_RATING = "customerRating";
+    this.PROVIDER_SHEET = "providerSheet";
+    this.PROVIDER_ID = "providerID";
+    this.PROVIDER_RATING = "providerRating";
+    this.ORDER_CUSTOMER_ID = "orderCustomerID";
+    this.ORDER_PROVIDER_ID = "orderProviderID";
+    this.ORDER_DATE = "orderDate";
 
-function findElement(arr, key) {
-  const match = findKey(arr, key);
-  return match ? match.element : null;
-}
-
-function findIndex(arr, key) {
-  const match = findKey(arr, key);
-  return match ? match.index : null;
-}
-
-function findKey(arr, key) {
-  const token = localStorage.getItem(key);
-  console.log(DEFAULT_KEY[key]);
-  if (!token) {
-    localStorage.setItem(key, DEFAULT_KEY[key]);
-    return find(arr, DEFAULT_KEY[key]);
+    this.DEFAULT_KEYS = {
+      [this.CUSTOMER_SHEET]: "Client",
+      [this.CUSTOMER_ID]: "ID",
+      [this.CUSTOMER_RATING]: "Niveau",
+      [this.PROVIDER_SHEET]: "Transporteur",
+      [this.PROVIDER_ID]: "ID",
+      [this.PROVIDER_RATING]: "Note",
+      [this.ORDER_CUSTOMER_ID]: "N° Client",
+      [this.ORDER_PROVIDER_ID]: "N° Four",
+      [this.ORDER_DATE]: "Date"
+    };
   }
-  return find(arr, token);
+
+  findSheet(arr, key) {
+    return this._findElement(arr, key);
+  }
+
+  findCell(arr, key) {
+    return this._findIndex(arr, key);
+  }
+
+  save(key, value) {
+    localStorage.setItem(key, value);
+  }
+
+  _findElement(arr, key) {
+    const match = this._findKey(arr, key);
+    return match ? match.element : null;
+  }
+
+  _findIndex(arr, key) {
+    const match = this._findKey(arr, key);
+    return match ? match.index : null;
+  }
+
+  _findKey(arr, key) {
+    const token = localStorage.getItem(key);
+    if (!token) {
+      this.save(key, this.DEFAULT_KEYS[key]);
+      return find(arr, this.DEFAULT_KEYS[key]);
+    }
+    return find(arr, token);
+  }
 }
 
 function find(arr, dict) {

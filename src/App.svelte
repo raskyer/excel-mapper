@@ -38,8 +38,10 @@
 		parseFile(dataFiles[0], workbook => {
 			dataWorkbook = workbook;
 			sheetNames = [...workbook.SheetNames];
-			customerSheet = Finder.findCustomerSheet(sheetNames);
-			providerSheet = Finder.findProviderSheet(sheetNames);
+			customerSheet = Finder.findSheet(sheetNames, Finder.CUSTOMER_SHEET);
+			providerSheet = Finder.findSheet(sheetNames, Finder.PROVIDER_SHEET);
+			onCustomerSheetChange();
+			onProviderSheetChange();
 		});
 	};
 
@@ -50,11 +52,33 @@
 			const sheet = orderWorkbook.Sheets[orderWorkbook.SheetNames[0]];
 			const data = parseSheet(sheet);
 			orderCells = data[0];
-			orderCustomerIDCell = Finder.findOrderCustomerID(orderCells);
-			orderProviderIDCell = Finder.findOrderProviderID(orderCells);
-			orderDateCell = Finder.findOrderDate(orderCells);
+			orderCustomerIDCell = Finder.findCell(orderCells, Finder.ORDER_CUSTOMER_ID);
+			orderProviderIDCell = Finder.findCell(orderCells, Finder.ORDER_PROVIDER_ID);
+			orderDateCell = Finder.findCell(orderCells, Finder.ORDER_DATE);
 		});
 	};
+
+	const onCustomerSheetChange = () => {
+		if (customerSheet === null) return;
+		Finder.save(Finder.CUSTOMER_SHEET, customerSheet);
+		const sheet = dataWorkbook.Sheets[customerSheet];
+		const data = parseSheet(sheet);
+		customerCells = data[0];
+		customerIDCell = customerIDCell ? customerIDCell : Finder.findCell(customerCells, Finder.CUSTOMER_ID);
+		customerRatingCell = customerRatingCell ? customerRatingCell : Finder.findCell(customerCells, Finder.CUSTOMER_RATING);
+	};
+
+	const onProviderSheetChange = () => {
+		if (providerSheet === null) return;
+		Finder.save(Finder.PROVIDER_SHEET, providerSheet);
+		const sheet = dataWorkbook.Sheets[providerSheet];
+		const data = parseSheet(sheet);
+		providerCells = data[0];
+		providerIDCell = providerIDCell ? providerIDCell : Finder.findCell(providerCells, Finder.PROVIDER_ID);
+		providerRatingCell = providerRatingCell ? providerRatingCell : Finder.findCell(providerCells, Finder.PROVIDER_RATING);
+	};
+
+	const onFindChange = (key, value) => Finder.save(key, value);
 
 	const onSubmit = e => {
 		e.preventDefault();
@@ -76,28 +100,6 @@
 
 		compute(settings, dataWorkbook, orderWorkbook);
 	};
-
-	// On First XLS Load & Customer Sheet change, update customer cells
-	$: {
-		if (dataWorkbook !== null && customerSheet !== null) {
-			const sheet = dataWorkbook.Sheets[customerSheet];
-			const data = parseSheet(sheet);
-			customerCells = data[0];
-			customerIDCell = customerIDCell ? customerIDCell : Finder.findCustomerID(customerCells);
-			customerRatingCell = customerRatingCell ? customerRatingCell : Finder.findCustomerRating(customerCells);
-		}
-	}
-
-	// On First XLS Load & Provider Sheet change, update provider cells
-	$: {
-		if (dataWorkbook !== null && providerSheet !== null) {
-			const sheet = dataWorkbook.Sheets[providerSheet];
-			const data = parseSheet(sheet);
-			providerCells = data[0];
-			providerIDCell = providerIDCell ? providerIDCell : Finder.findProviderID(providerCells);
-			providerRatingCell = providerRatingCell ? providerRatingCell : Finder.findProviderRating(providerCells);
-		}
-	}
 </script>
 
 <main class="container">
@@ -129,6 +131,7 @@
 								id="customer-sheetname"
 								class={"form-control " + (customerSheet === null ? "is-invalid" : "is-valid")}
 								bind:value={customerSheet}
+								on:change={onCustomerSheetChange}
 								required
 							>
 								<option value={null}>Choissisez...</option>
@@ -147,6 +150,7 @@
 									id="customer-id"
 									class={"form-control " + (customerIDCell === null ? "is-invalid" : "is-valid")}
 									bind:value={customerIDCell}
+									on:change={() => onFindChange(Finder.CUSTOMER_ID, customerCells[customerIDCell])}
 									required
 								>
 									<option value={null}>Choissisez...</option>
@@ -164,6 +168,7 @@
 									id="customer-rating"
 									class={"form-control " + (customerRatingCell === null ? "is-invalid" : "is-valid")}
 									bind:value={customerRatingCell}
+									on:change={() => onFindChange(Finder.CUSTOMER_RATING, customerCells[customerRatingCell])}
 									required
 								>
 									<option value={null}>Choissisez...</option>
@@ -184,6 +189,7 @@
 								id="provider-sheetname"
 								class={"form-control " + (providerSheet === null ? "is-invalid" : "is-valid")}
 								bind:value={providerSheet}
+								on:change={onProviderSheetChange}
 								required
 							>
 								<option value={null}>Choissisez...</option>
@@ -202,6 +208,7 @@
 									id="provider-id"
 									class={"form-control " + (providerIDCell === null ? "is-invalid" : "is-valid")}
 									bind:value={providerIDCell}
+									on:change={() => onFindChange(Finder.PROVIDER_ID, providerCells[providerIDCell])}
 									required
 								>
 									<option value={null}>Choissisez...</option>
@@ -219,6 +226,7 @@
 									id="provider-rating"
 									class={"form-control " + (providerRatingCell === null ? "is-invalid" : "is-valid")}
 									bind:value={providerRatingCell}
+									on:change={() => onFindChange(Finder.PROVIDER_RATING, providerCells[providerRatingCell])}
 									required
 								>
 									<option value={null}>Choissisez...</option>
@@ -259,6 +267,7 @@
 								id="order-customer-id"
 								class={"form-control " + (orderCustomerIDCell === null ? "is-invalid" : "is-valid")}
 								bind:value={orderCustomerIDCell}
+								on:change={() => onFindChange(Finder.ORDER_CUSTOMER_ID, orderCells[orderCustomerIDCell])}
 								required
 							>
 								<option value={null}>Choissisez...</option>
@@ -278,6 +287,7 @@
 								id="order-provider-id"
 								class={"form-control " + (orderProviderIDCell === null ? "is-invalid" : "is-valid")}
 								bind:value={orderProviderIDCell}
+								on:change={() => onFindChange(Finder.ORDER_PROVIDER_ID, orderCells[orderProviderIDCell])}
 								required
 							>
 								<option value={null}>Choissisez...</option>
@@ -297,6 +307,7 @@
 						id="order-date"
 						class={"form-control " + (orderDateCell === null ? "is-invalid" : "is-valid")}
 						bind:value={orderDateCell}
+						on:change={() => onFindChange(Finder.ORDER_DATE, orderCells[orderDateCell])}
 						required
 					>
 						<option value={null}>Choissisez...</option>

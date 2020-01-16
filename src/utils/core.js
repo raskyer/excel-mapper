@@ -1,3 +1,5 @@
+import { parseSheet } from './excel';
+
 export function compute(settings, dataWorkbook, orderWorkbook) {
   const customerSheet = parseSheet(dataWorkbook.Sheets[settings.customerSheet]);
   const providerSheet = parseSheet(dataWorkbook.Sheets[settings.providerSheet]);
