@@ -1,32 +1,15 @@
-import XLSX from 'xlsx';
+export function compute(settings, dataWorkbook, orderWorkbook) {
+  const customerSheet = parseSheet(dataWorkbook.Sheets[settings.customerSheet]);
+  const providerSheet = parseSheet(dataWorkbook.Sheets[settings.providerSheet]);
+  const orderSheet = parseSheet(orderWorkbook.Sheets[orderWorkbook.SheetNames[0]]);
 
-export function uploadFile(file, callback) {
-  const reader = new FileReader();
-  reader.onload = e => {
-    const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-    callback(workbook);
-  };
-  reader.readAsArrayBuffer(file);
-}
+  const customerMap = createMap(customerSheet, settings.customerIDCell);
+  const providerMap = createMap(providerSheet, settings.providerIDCell);
 
-export function findSheet(arr, dict) {
-  return arr.reduce((p, c) => {
-    if (p !== null) return p;
-    if (c.indexOf(dict) !== -1) return c;
-    return null;
-  }, null);
-}
+  const orders = createOrderRanking(customerMap, providerMap, orderSheet, settings);
 
-export function findCell(arr, dict) {
-  return arr.reduce((p, c, i) => {
-    if (p !== null) return p;
-    if (c.indexOf(dict) !== -1) return i;
-    return null;
-  }, null);
-}
-
-export function extractSheetData(sheet) {
-  return XLSX.utils.sheet_to_json(sheet, { header: 1 });
+  // project orders => final xls based on config key
+  // save into new excel file
 }
 
 function createMap(sheet, idCell) {
@@ -85,18 +68,4 @@ function createOrderRanking(customerMap, providerMap, orderSheet, settings) {
     orders.push({ order: orderSheet[i], ranking })
   }
   return orders.sort((a, b) => b.ranking - a.ranking);
-}
-
-export function compute(settings, dataWorkbook, orderWorkbook) {
-  const customerSheet = extractSheetData(dataWorkbook.Sheets[settings.customerSheet]);
-  const providerSheet = extractSheetData(dataWorkbook.Sheets[settings.providerSheet]);
-  const orderSheet = extractSheetData(orderWorkbook.Sheets[orderWorkbook.SheetNames[0]]);
-
-  const customerMap = createMap(customerSheet, settings.customerIDCell);
-  const providerMap = createMap(providerSheet, settings.providerIDCell);
-
-  const orders = createOrderRanking(customerMap, providerMap, orderSheet, settings);
-
-  // project orders => final xls based on config key
-  // save into new excel file
 }

@@ -1,5 +1,7 @@
 <script>
-	import { uploadFile, findSheet, findCell, extractSheetData, compute } from './utils';
+	import { parseFile, parseSheet } from './utils/excel';
+	import Finder from './utils/finder';
+	import { compute } from './utils/core';
 
 	// Files
 	let dataFiles = [];
@@ -25,7 +27,6 @@
 	let orderCustomerIDCell = null;
 	let orderProviderIDCell = null;
 	let orderDateCell = null;
-	let orderTimeCell = null;
 
 	// Settings
 	let stxProviderRating = 3;
@@ -34,25 +35,24 @@
 
 	const onDataUpload = () => {
 		if (dataFiles.length < 1) return;
-		uploadFile(dataFiles[0], workbook => {
+		parseFile(dataFiles[0], workbook => {
 			dataWorkbook = workbook;
 			sheetNames = [...workbook.SheetNames];
-			customerSheet = findSheet(sheetNames, 'Client');
-			providerSheet = findSheet(sheetNames, 'Transporteur');
+			customerSheet = Finder.findCustomerSheet(sheetNames);
+			providerSheet = Finder.findProviderSheet(sheetNames);
 		});
 	};
 
 	const onOrderUpload = () => {
 		if (orderFiles.length < 1) return;
-		uploadFile(orderFiles[0], workbook => {
+		parseFile(orderFiles[0], workbook => {
 			orderWorkbook = workbook;
 			const sheet = orderWorkbook.Sheets[orderWorkbook.SheetNames[0]];
-			const data = extractSheetData(sheet);
+			const data = parseSheet(sheet);
 			orderCells = data[0];
-			orderCustomerIDCell = findCell(orderCells, 'N° Client');
-			orderProviderIDCell = findCell(orderCells, 'N° Fourn');
-			orderDateCell = findCell(orderCells, 'Date');
-			orderTimeCell = findCell(orderCells, 'Date');
+			orderCustomerIDCell = Finder.findOrderCustomerID(orderCells);
+			orderProviderIDCell = Finder.findOrderProviderID(orderCells);
+			orderDateCell = Finder.findOrderDate(orderCells);
 		});
 	};
 
@@ -69,7 +69,6 @@
 			orderCustomerIDCell,
 			orderProviderIDCell,
 			orderDateCell,
-			orderTimeCell,
 			stxProviderRating,
 			stxDate,
 			stxCustomerRating
@@ -82,10 +81,10 @@
 	$: {
 		if (dataWorkbook !== null && customerSheet !== null) {
 			const sheet = dataWorkbook.Sheets[customerSheet];
-			const data = extractSheetData(sheet);
+			const data = parseSheet(sheet);
 			customerCells = data[0];
-			customerIDCell = customerIDCell ? customerIDCell : findCell(customerCells, 'ID');
-			customerRatingCell = customerRatingCell ? customerRatingCell : findCell(customerCells, 'Niveau');
+			customerIDCell = customerIDCell ? customerIDCell : Finder.findCustomerID(customerCells);
+			customerRatingCell = customerRatingCell ? customerRatingCell : Finder.findCustomerRating(customerCells);
 		}
 	}
 
@@ -93,10 +92,10 @@
 	$: {
 		if (dataWorkbook !== null && providerSheet !== null) {
 			const sheet = dataWorkbook.Sheets[providerSheet];
-			const data = extractSheetData(sheet);
+			const data = parseSheet(sheet);
 			providerCells = data[0];
-			providerIDCell = providerIDCell ? providerIDCell : findCell(providerCells, 'ID');
-			providerRatingCell = providerRatingCell ? providerRatingCell : findCell(providerCells, 'Note');
+			providerIDCell = providerIDCell ? providerIDCell : Finder.findProviderID(providerCells);
+			providerRatingCell = providerRatingCell ? providerRatingCell : Finder.findProviderRating(providerCells);
 		}
 	}
 </script>
@@ -298,23 +297,6 @@
 						id="order-date"
 						class={"form-control " + (orderDateCell === null ? "is-invalid" : "is-valid")}
 						bind:value={orderDateCell}
-						required
-					>
-						<option value={null}>Choissisez...</option>
-						{#each orderCells as cell, i}
-							<option value={i}>
-								{cell}
-							</option>
-						{/each}
-					</select>
-				</div>
-
-				<div class="form-group">
-					<label for="order-time">Cellule d'horaire</label>
-					<select
-						id="order-time"
-						class={"form-control " + (orderTimeCell === null ? "is-invalid" : "is-valid")}
-						bind:value={orderTimeCell}
 						required
 					>
 						<option value={null}>Choissisez...</option>
