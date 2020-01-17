@@ -81,7 +81,12 @@ function createOrderRanking(customerMap, providerMap, orderSheet, settings) {
     
     orders.push({ order: orderSheet[i], ranking })
   }
-  return orders.sort((a, b) => b.ranking - a.ranking);
+  return orders.sort((a, b) => {
+    if (a.order[0] !== b.order[0]) {
+      return a.order[0].localeCompare(b.order[0]);
+    }
+    return b.ranking - a.ranking
+  });
 }
 
 function createProjection(orders, headers, projection) {
