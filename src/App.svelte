@@ -359,7 +359,7 @@
 			</div>
 		</fieldset>
 
-		<div class="form-group">
+		<div class="form-group text-right">
 			<button type="submit" class="btn btn-success">Valider</button>
 		</div>
 	</form>
@@ -368,14 +368,17 @@
 <style>
 fieldset {
 	margin: 10px 0px;
-	border: 1px grey solid;
+	border: 1px solid #ddd;
 	padding: 10px;
+	background-color:#f5f5f5;
 }
 
 legend {
 	font-size: 1em;
-	background: grey;
-	color: white;
-	text-align: center;
+	width: auto;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 5px;
+	background-color: #ffffff;
 }
 </style>
