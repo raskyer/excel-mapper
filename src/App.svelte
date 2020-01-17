@@ -1,5 +1,5 @@
 <script>
-	import { parseFile, parseSheet } from './utils/excel';
+	import { parseFile, parseSheet, createWorkbook } from './utils/excel';
 	import Finder from './utils/finder';
 	import { compute } from './utils/core';
 
@@ -98,7 +98,11 @@
 			stxCustomerRating
 		};
 
-		compute(settings, dataWorkbook, orderWorkbook);
+		const projection = compute(settings, dataWorkbook, orderWorkbook);
+		const wb = createWorkbook(projection);
+
+		console.log(projection);
+		console.log(wb);
 	};
 </script>
 

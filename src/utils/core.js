@@ -1,5 +1,18 @@
 import { parseSheet } from './excel';
 
+const DEFAULT_PROJECTION = {
+  "Type": "Type",
+  "Nom Client": "Nom Client",
+  "Nom Fourn.": "Nom Transporteur",
+  "Date Charg.": "Date Chargement",
+  "Date Livr.": "Date Livraison",
+  "CP Charg.": "CP Chargement",
+  "Ville Charg.": "Ville Chargement",
+  "CP Livr.": "CP Livraison",
+  "Ville Livr.": "Ville Livraison",
+  "Commentaires": "Commentaires"
+};
+
 export function compute(settings, dataWorkbook, orderWorkbook) {
   const customerSheet = parseSheet(dataWorkbook.Sheets[settings.customerSheet]);
   const providerSheet = parseSheet(dataWorkbook.Sheets[settings.providerSheet]);
@@ -10,8 +23,7 @@ export function compute(settings, dataWorkbook, orderWorkbook) {
 
   const orders = createOrderRanking(customerMap, providerMap, orderSheet, settings);
 
-  // project orders => final xls based on config key
-  // save into new excel file
+  return createProjection(orders, orderSheet[0], DEFAULT_PROJECTION);
 }
 
 function createMap(sheet, idCell) {
@@ -70,4 +82,32 @@ function createOrderRanking(customerMap, providerMap, orderSheet, settings) {
     orders.push({ order: orderSheet[i], ranking })
   }
   return orders.sort((a, b) => b.ranking - a.ranking);
+}
+
+/*
+  {
+    "Named key": "key"
+  }
+*/
+
+function createProjection(orders, headers, projection) {
+  const newHeaders = [];
+  for (let key of Object.keys(projection)) {
+    const index = headers.indexOf(key); // index of named key
+    const name = projection[key]; // remapping name
+    newHeaders.push({ name, index });
+  }
+  const mapped = orders.map(({ order }) => {
+    const newOrder = [];
+    for (let header of newHeaders) {
+      if (header.index !== -1) {
+        newOrder.push(order[header.index]);
+      } else {
+        newOrder.push('');
+      }
+    }
+    return newOrder;
+  });
+  mapped.unshift(newHeaders.map(h => h.name));
+  return mapped;
 }

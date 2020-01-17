@@ -12,3 +12,12 @@ export function parseFile(file, callback) {
 export function parseSheet(sheet) {
   return XLSX.utils.sheet_to_json(sheet, { header: 1 });
 }
+
+export function createWorkbook(data) {
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.aoa_to_sheet(data);
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Feuille 1");
+  //return XLSX.utils.json_to_sheet(json, { header: json[0], origin: 'A1' });
+  XLSX.writeFile(workbook, 'out.xlsx', { bookType:'xlsx', bookSST:false, type:'array' });
+  return workbook;
+}
