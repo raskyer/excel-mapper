@@ -41,8 +41,8 @@ function calculateProvider(provider, settings) {
   return (6 - provider[settings.providerRatingCell]) * settings.stxProviderRating;
 }
 
-function caclulateDate(date, time, settings) {
-  if (date === undefined || time === undefined) {
+function caclulateDates(dates, settings) {
+  if (dates === undefined) {
     return 1;
   }
   //date + time * settings.stxDate;
@@ -71,11 +71,10 @@ function createOrderRanking(customerMap, providerMap, orderSheet, settings) {
     const customer = customerMap.get(customerKey);
     const provider = providerMap.get(providerKey);
 
-    const date = orderSheet[i][settings.orderDateCell];
-    const time = orderSheet[i][settings.orderTimeCell];
+    const dates = settings.orderDateCells.map(orderDateCell => orderSheet[i][orderDateCell]);
 
     const providerRanking = calculateProvider(provider, settings);
-    const dateRanking = caclulateDate(date, time, settings);
+    const dateRanking = caclulateDates(dates, time, settings);
     const customerRanking = calculateCustomer(customer, settings);
     const ranking = providerRanking + dateRanking + customerRanking;
     

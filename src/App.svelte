@@ -14,7 +14,7 @@
 	};
 </script>
 
-<main class="container">
+<main class="container-fluid">
 	<h1>Excel Mapper</h1>
 	<img src="" alt="logo"/>
 

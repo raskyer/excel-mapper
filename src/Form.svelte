@@ -26,7 +26,7 @@
 	let orderCells = [];
 	let orderCustomerIDCell = null;
 	let orderProviderIDCell = null;
-	let orderDateCell = null;
+	let orderDateCells = [];
 
 	// Settings
 	let stxProviderRating = 3;
@@ -56,7 +56,7 @@
 			orderCells = data[0];
 			orderCustomerIDCell = Finder.findCell(orderCells, Finder.ORDER_CUSTOMER_ID);
 			orderProviderIDCell = Finder.findCell(orderCells, Finder.ORDER_PROVIDER_ID);
-			orderDateCell = Finder.findCell(orderCells, Finder.ORDER_DATE);
+      orderDateCells = Finder.findMultipleCell(orderCells, Finder.ORDER_DATE);
 		});
 	};
 
@@ -93,7 +93,7 @@
 			providerRatingCell,
 			orderCustomerIDCell,
 			orderProviderIDCell,
-			orderDateCell,
+			orderDateCells,
 			stxProviderRating,
 			stxDate,
 			stxCustomerRating
@@ -278,13 +278,15 @@
 
       <div class="form-group">
         <label for="order-date">Cellule de date</label>
+        <!-- on:change={() => onFindChange(Finder.ORDER_DATE, orderCells[orderDateCells])} -->
         <select
           id="order-date"
-          class={'form-control ' + (orderDateCell === null ? 'is-invalid' : 'is-valid')}
-          bind:value={orderDateCell}
-          on:change={() => onFindChange(Finder.ORDER_DATE, orderCells[orderDateCell])}
-          required>
-          <option value={null}>Choissisez...</option>
+          class={'form-control ' + (orderDateCells.length < 1 ? 'is-invalid' : 'is-valid')}
+          bind:value={orderDateCells}
+          multiple
+          on:change={() => {/* TODO: allow arrays */}}
+          required
+        >
           {#each orderCells as cell, i}
             <option value={i}>{cell}</option>
           {/each}

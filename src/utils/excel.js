@@ -3,7 +3,7 @@ import XLSX from 'xlsx';
 export function parseFile(file, callback) {
   const reader = new FileReader();
   reader.onload = e => {
-    const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+    const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: true });
     callback(workbook);
   };
   reader.readAsArrayBuffer(file);

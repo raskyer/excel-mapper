@@ -19,7 +19,7 @@ class Finder {
       [this.PROVIDER_RATING]: 'Note',
       [this.ORDER_CUSTOMER_ID]: 'N° Client',
       [this.ORDER_PROVIDER_ID]: 'N° Four',
-      [this.ORDER_DATE]: 'Date'
+      [this.ORDER_DATE]: 'Date' /* TODO: allow array */
     };
   }
 
@@ -29,6 +29,18 @@ class Finder {
 
   findCell(arr, key) {
     return this._findIndex(arr, key);
+  }
+
+  findMultipleCell(arr, key) {
+    const token = this._findToken(key); /* TODO: allow array of tokens */
+    return arr
+      .map((name, index) => {
+        if (name.indexOf(token) !== -1) {
+          return index;
+        }
+        return -1;
+      })
+      .filter(index => index !== -1);
   }
 
   save(key, value) {
@@ -46,12 +58,17 @@ class Finder {
   }
 
   _findKey(arr, key) {
+    const token = this._findToken(key);
+    return find(arr, token);
+  }
+
+  _findToken(key) {
     const token = localStorage.getItem(key);
     if (!token) {
       this.save(key, this.DEFAULT_KEYS[key]);
-      return find(arr, this.DEFAULT_KEYS[key]);
+      return this.DEFAULT_KEYS[key];
     }
-    return find(arr, token);
+    return token;
   }
 }
 
