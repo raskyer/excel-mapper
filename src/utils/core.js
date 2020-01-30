@@ -45,8 +45,22 @@ function caclulateDates(dates, settings) {
   if (dates === undefined) {
     return 1;
   }
-  //date + time * settings.stxDate;
-  return 1;
+
+  const today = new Date();
+  const filtered = dates
+    .filter(date => {
+      return (
+        today.getDate() === date.getDate()
+        && today.getMonth() === date.getMonth()
+        && today.getFullYear() === date.getFullYear()
+      );
+    })
+    .map(date => 24 - date.getHours())
+    .map(mark => (mark / 24) * 5);
+
+  const avg = filtered.reduce((prev, next) => prev + next, 0) / filtered.length;
+
+  return avg * settings.stxDate;
 }
 
 function calculateCustomer(customer, settings) {
