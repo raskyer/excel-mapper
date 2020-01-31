@@ -7,15 +7,20 @@
 	let data = null;
 
 	const onCompute = finalData => {
-		data = finalData;
-		const wb = createWorkbook(finalData);
 		console.log(finalData);
-		console.log(wb);
+		data = finalData;
+		//const wb = createWorkbook(finalData);
+		//console.log(wb);
 	};
 </script>
 
-<main class="container-fluid">
-	<h1>Excel Mapper</h1>
+<nav class="navbar fixed-top navbar-dark bg-dark">
+	<a class="navbar-brand" href="/">
+		Excel Mapper
+	</a>
+</nav>
+
+<main class="container">
 	<img src="" alt="logo"/>
 
 	{#if data === null}
@@ -23,6 +28,14 @@
 			<Form onCompute={onCompute} />		
 		</div>
 	{:else}
-		<Result data={data} />
+		<div transition:fade>
+			<Result data={data} />
+		</div>
 	{/if}
 </main>
+
+<style>
+.container {
+	margin-top: 80px;
+}
+</style>

@@ -16,7 +16,7 @@ const DEFAULT_PROJECTION = {
 export function compute(settings, dataWorkbook, orderWorkbook) {
   const customerSheet = parseSheet(dataWorkbook.Sheets[settings.customerSheet]);
   const providerSheet = parseSheet(dataWorkbook.Sheets[settings.providerSheet]);
-  const orderSheet = parseSheet(orderWorkbook.Sheets[orderWorkbook.SheetNames[0]]);
+  const orderSheet = parseSheet(orderWorkbook.Sheets[settings.orderSheet]);
 
   const customerMap = createMap(customerSheet, settings.customerIDCell);
   const providerMap = createMap(providerSheet, settings.providerIDCell);
@@ -38,65 +38,54 @@ function calculateProvider(provider, settings) {
   if (provider === undefined) {
     return 1;
   }
-  return (6 - provider[settings.providerRatingCell]) * settings.stxProviderRating;
+  return (6 - provider[settings.providerRating]) * settings.providerRate;
 }
 
-function caclulateDates(dates, settings) {
-  if (dates === undefined) {
+function caclulateDates(date, settings) {
+  if (date === undefined) {
     return 1;
   }
 
-  const today = new Date();
-  const filtered = dates
-    .filter(date => {
-      return (
-        today.getDate() === date.getDate()
-        && today.getMonth() === date.getMonth()
-        && today.getFullYear() === date.getFullYear()
-      );
-    })
-    .map(date => 24 - date.getHours())
-    .map(mark => (mark / 24) * 5);
+  const rate = 24 - date.getHours();
+  const mark = (rate / 24) * 5
 
-  const avg = filtered.reduce((prev, next) => prev + next, 0) / filtered.length;
-
-  return avg * settings.stxDate;
+  return mark * settings.dateRate;
 }
 
 function calculateCustomer(customer, settings) {
   if (customer === undefined) {
     return 1;
   }
-  const rating = customer[settings.customerRatingCell];
+  const rating = customer[settings.customerRating];
   switch (rating.toLowerCase().trim()) {
     case 'sensible':
-      return 5 * settings.stxCustomerRating;
+      return 5 * settings.customerRate;
     default:
-      return 1 * settings.stxCustomerRating;
+      return 1 * settings.customerRate;
   }
 }
 
 function createOrderRanking(customerMap, providerMap, orderSheet, settings) {
   const orders = [];
   for (let i = 1; i < orderSheet.length; i++) {
-    const customerKey = orderSheet[i][settings.orderCustomerIDCell];
-    const providerKey = orderSheet[i][settings.orderProviderIDCell];
+    const customerKey = orderSheet[i][settings.orderCustomerID];
+    const providerKey = orderSheet[i][settings.orderProviderID];
 
     const customer = customerMap.get(customerKey);
     const provider = providerMap.get(providerKey);
-
-    const dates = settings.orderDateCells.map(orderDateCell => orderSheet[i][orderDateCell]);
+    const date = orderSheet[i][settings.orderType] === 'Chargement' ?
+      orderSheet[i][settings.orderDateShipping] : orderSheet[i][settings.orderDateDelivery];
 
     const providerRanking = calculateProvider(provider, settings);
-    const dateRanking = caclulateDates(dates, time, settings);
+    const dateRanking     = caclulateDates(date, settings);
     const customerRanking = calculateCustomer(customer, settings);
     const ranking = providerRanking + dateRanking + customerRanking;
     
     orders.push({ order: orderSheet[i], ranking })
   }
   return orders.sort((a, b) => {
-    if (a.order[0] !== b.order[0]) {
-      return a.order[0].localeCompare(b.order[0]);
+    if (a.order[settings.orderType] !== b.order[settings.orderType]) {
+      return a.order[settings.orderType].localeCompare(b.order[settings.orderType]);
     }
     return b.ranking - a.ranking
   });
@@ -115,6 +104,8 @@ function createProjection(orders, headers, projection) {
       newHeaders
         .map(({ index }) => index !== -1 ? order[index] : '')
     );
+
+  // insert headers at first line
   mapped.unshift(newHeaders.map(({ name }) => name));
 
   return mapped;

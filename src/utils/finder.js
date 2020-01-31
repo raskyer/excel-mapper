@@ -3,12 +3,17 @@ class Finder {
     this.CUSTOMER_SHEET = 'customerSheet';
     this.CUSTOMER_ID = 'customerID';
     this.CUSTOMER_RATING = 'customerRating';
+
     this.PROVIDER_SHEET = 'providerSheet';
     this.PROVIDER_ID = 'providerID';
     this.PROVIDER_RATING = 'providerRating';
+
+    this.ORDER_SHEET = 'orderSheet';
+    this.ORDER_TYPE = 'orderType';
     this.ORDER_CUSTOMER_ID = 'orderCustomerID';
     this.ORDER_PROVIDER_ID = 'orderProviderID';
-    this.ORDER_DATE = 'orderDate';
+    this.ORDER_DATE_SHIPPING = 'orderDateShipping';
+    this.ORDER_DATE_DELIVERY = 'orderDateDelivery';
 
     this.DEFAULT_KEYS = {
       [this.CUSTOMER_SHEET]: 'Client',
@@ -17,9 +22,12 @@ class Finder {
       [this.PROVIDER_SHEET]: 'Transporteur',
       [this.PROVIDER_ID]: 'ID',
       [this.PROVIDER_RATING]: 'Note',
+      [this.ORDER_SHEET]: '',
+      [this.ORDER_TYPE]: 'Type',
       [this.ORDER_CUSTOMER_ID]: 'N° Client',
       [this.ORDER_PROVIDER_ID]: 'N° Four',
-      [this.ORDER_DATE]: 'Date' /* TODO: allow array */
+      [this.ORDER_DATE_SHIPPING]: 'Date Charg.',
+      [this.ORDER_DATE_DELIVERY]: 'Date Livr.'
     };
   }
 
@@ -31,19 +39,8 @@ class Finder {
     return this._findIndex(arr, key);
   }
 
-  findMultipleCell(arr, key) {
-    const token = this._findToken(key); /* TODO: allow array of tokens */
-    return arr
-      .map((name, index) => {
-        if (name.indexOf(token) !== -1) {
-          return index;
-        }
-        return -1;
-      })
-      .filter(index => index !== -1);
-  }
-
   save(key, value) {
+    console.log('save : ', key, value);
     localStorage.setItem(key, value);
   }
 
