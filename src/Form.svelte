@@ -30,9 +30,9 @@
   };
 
   let ratingSettings = {
-    provider: 3,
-    date: 2,
-    customer: 1
+    providerRate: 3,
+    dateRate: 2,
+    customerRate: 1
   };
 
   let projectionSettings = {};
