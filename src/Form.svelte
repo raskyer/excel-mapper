@@ -3,6 +3,7 @@
 
   import DBForm from './components/DBForm.svelte';
   import OrderForm from './components/OrderForm.svelte';
+  import RatingForm from './components/RatingForm.svelte';
 	
   let dbWorkbook = null;
   let dbSettings = {
@@ -54,7 +55,7 @@
 <form on:submit={onSubmit}>
   <DBForm bind:workbook={dbWorkbook} bind:stx={dbSettings} />
   <OrderForm bind:workbook={orderWorkbook} bind:stx={orderSettings} />
-  <!-- <RatingForm bind:stx={ratingSettings} -->
+  <RatingForm bind:stx={ratingSettings} />
 
   <div class="form-group text-right">
     <button type="submit" class="btn btn-success">Valider</button>

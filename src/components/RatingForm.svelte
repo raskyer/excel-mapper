@@ -13,7 +13,8 @@
       id="rating-provider"
       type="number"
       class="form-control"
-      bind:value={stx.provider} />
+      bind:value={stx.providerRate}
+      min={0} />
   </div>
 
   <div class="form-group">
@@ -22,7 +23,8 @@
       id="rating-date"
       type="number"
       class="form-control"
-      bind:value={stx.date} />
+      bind:value={stx.dateRate}
+      min={0} />
   </div>
 
   <div class="form-group">
@@ -33,7 +35,8 @@
       id="rating-customer"
       type="number"
       class="form-control"
-      bind:value={stx.customer} />
+      bind:value={stx.customerRate}
+      min={0} />
   </div>
 </fieldset>
 

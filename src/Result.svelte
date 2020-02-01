@@ -3,7 +3,6 @@
 </script>
 
 <table class="table table-bordered table-hover table-sm">
-  <caption>Result</caption>
   <thead class="thead-dark">
     <tr>
       {#each data[0] as header}

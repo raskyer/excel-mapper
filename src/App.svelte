@@ -1,16 +1,15 @@
 <script>
 	import { fade } from 'svelte/transition';
-	import { createWorkbook } from './utils/excel';
+	import { createWorkbook, downloadWorkbook } from './utils/excel';
 	import Form from './Form.svelte';
 	import Result from './Result.svelte';
 
 	let data = null;
 
 	const onCompute = finalData => {
-		console.log(finalData);
 		data = finalData;
-		//const wb = createWorkbook(finalData);
-		//console.log(wb);
+		const wb = createWorkbook(finalData);
+		//downloadWorkbook(wb);
 	};
 </script>
 
@@ -21,8 +20,6 @@
 </nav>
 
 <main class="container">
-	<img src="" alt="logo"/>
-
 	{#if data === null}
 		<div transition:fade>
 			<Form onCompute={onCompute} />		

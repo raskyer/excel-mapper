@@ -15,6 +15,10 @@ class Finder {
     this.ORDER_DATE_SHIPPING = 'orderDateShipping';
     this.ORDER_DATE_DELIVERY = 'orderDateDelivery';
 
+    this.PROVIDER_RATE = 'providerRate';
+    this.DATE_RATE = 'dateRate';
+    this.CUSTOMER_RATE = 'customerRate';
+
     this.DEFAULT_KEYS = {
       [this.CUSTOMER_SHEET]: 'Client',
       [this.CUSTOMER_ID]: 'ID',
@@ -40,7 +44,6 @@ class Finder {
   }
 
   save(key, value) {
-    console.log('save : ', key, value);
     localStorage.setItem(key, value);
   }
 
