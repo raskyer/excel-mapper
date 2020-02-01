@@ -9,7 +9,7 @@
 	const onCompute = finalData => {
 		data = finalData;
 		const wb = createWorkbook(finalData);
-		//downloadWorkbook(wb);
+		downloadWorkbook(wb);
 	};
 </script>
 
