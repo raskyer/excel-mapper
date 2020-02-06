@@ -104,6 +104,12 @@ function getCustomerRanking(customerKey, customerMap, settings) {
   switch (rating) {
     case 'sensible':
       return 5 * coef;
+    case 'rdv':
+      return 4 * coef;
+    case 'flexible/fragile':
+      return 3 * coef;
+    case 'ponctuel':
+      return 2 * coef;
     default:
       return 1 * coef;
   }
